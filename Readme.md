@@ -21,7 +21,7 @@ First create your **Express.js** app
  const app = express()
 ```
 
-Create your Main class that take the **Register** decorator and pass your controllers, services and your express app in your context.
+Create your Main class that take the **Register** decorator and pass your controllers, services and your **Express.js** app in your context.
 
 
 ``` Typescript
@@ -56,7 +56,7 @@ You can use **Express.js dynamic routing expression on your Method**
 import { Controller, Get } from 'elsombrero/core'
 
 @Controller()
-class Index{
+export class Index{
   @Get()
   public index(): any{
     return { message: 'Hello World' }
@@ -69,13 +69,34 @@ class Index{
 
 ```
 
+Then Register your Controller on your Main class
+
+``` Typescript
+import { Register } from 'elsombrero/core'
+import { Index } from './index.controller.ts'
+
+@Register({
+  controllers: [Index],
+  services: [],
+  context: app
+})
+class Main{
+  public async static main(){
+    app.listen(8080, () => console.log('Servier is running!'))
+  }
+}
+
+Main.main()
+
+```
+
 You can get your HttpContext on your controller method by specifying the HttpContext argument on your Method.
 
 ``` Ts
 import { Controller, Post, HttpContext } from 'elsombrero/core'
 
 @Controller('/article')
-class Article{
+export class Article{
   @Get('/:id')
   public index({params, query}): any{
     return { message: 'Hello World' }
@@ -132,7 +153,7 @@ now you can catch your exceptions by using throw
 import { Controller, Get, HttpContext } from 'elsombrero/core'
 
 @Controller('/article')
-class Article{
+export class Article{
   @Get('/:id')
   public index({params, query}: HttpContext): any{
     throw new NotFound()
@@ -150,12 +171,75 @@ Second Optionnal Parameter is the data you to pass to your view.
 import { Controller, View, Get, HttpContext } from 'elsombrero/core'
 
 @Controller('/article')
-class Article{
+export class Article{
   @Get('/:id')
   public index({query}: HttpContext): View{
     return new View('index', {query})
   } 
 }
 ```
+
+## Injectable and Services (Dependencies Injection)
+
+You can Inject dependencies on your class by using the @Injectable decorator then you can access to your dependencies by
+adding them on your constructor argument
+
+## Example
+
+Create a file article.service.ts
+
+``` Ts
+import { Injectable } from 'elsombrero/core'
+
+@Injectable()
+export class Article{
+
+  public findOne(id: string){
+    return {id, name: 'My Article'}
+  }
+  
+}
+```
+
+On Your article.controller.ts : 
+
+``` Ts
+import { Controller, View, Get, HttpContext } from 'elsombrero/core'
+import { ArticleService } from './article.service.ts'
+
+@Controller('/article')
+export class Article{
+
+  public constructor(public article: ArticleService){}
+
+  @Get('/:id')
+  public index({params}: HttpContext): any{
+    return this.article.findOne(params.id)
+  } 
+}
+```
+
+And don't forget to register your Services and Controllers
+
+``` Typescript
+import { Register } from 'elsombrero/core'
+import { Index } from './index.controller.ts'
+import { ArticleService } from './article.service.ts'
+
+@Register({
+  controllers: [Article],
+  services: [ArticleService],
+  context: app
+})
+class Main{
+  public async static main(){
+    app.listen(8080, () => console.log('Servier is running!'))
+  }
+}
+
+Main.main()
+
+```
+
 
 # Enjoy ❤👌
