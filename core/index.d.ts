@@ -15,7 +15,7 @@ interface RegisterArgs{
 
 export function Register(args: RegisterArgs)
 
-export interface ControllerMethod{
+export interface HttpContext{
   request: Request 
   response: Response,
   body: any, 

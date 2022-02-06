@@ -11,5 +11,25 @@
   "dependencies": {
     "reflect-metadata": "^0.1.13",
     "typedi": "^0.10.0"
+  },
+  "author": "Rakotondrasoa Nirilala <nirilala15@gmail.com>",
+  "keywords": [
+    "decorators",
+    "elsombrero",
+    "core",
+    "typescript",
+    "node",
+    "reflect",
+    "decorator",
+    "http",
+    "requests",
+    "express",
+    "express-ts",
+    "express-typescript",
+    "javascript"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ElSombrero2/elsombrero.git"
   }
 }
