@@ -1,3 +1,4 @@
+import { HttpHandler } from './../handler.interface';
 import { Service } from 'typedi';
 import { IncomingHttpHeaders } from 'http2';
 import 'reflect-metadata'

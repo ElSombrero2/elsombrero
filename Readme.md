@@ -129,34 +129,126 @@ export interface HttpContext{
   headers: IncomingHttpHeaders
 }
 ```
+## Create Middleware
 
+You can create Middleware by implementing HttpHandler in your class which take **HttpContext** argument. You can pass it in your Method Decorator on second argument or on your controller second argument.
+You can pass as much middlewares as you want on your Controller or method decorator.
+
+### Example
+
+``` Ts
+import { Controller, Post, HttpContext, HttpHandler } from 'elsombrero/core'
+
+class FirstHandler implements HttpHandler{
+  public handle(context: HttpContext): void{
+    console.log('First Middleware')
+    context.next()
+  }
+}
+
+class SecondHandler implements HttpHandler{
+  public handle(context: HttpContext): void{
+    console.log('Second Middleware')
+    context.next()
+  }
+}
+
+@Controller('/article', FirstHandler, SecondHandler)
+export class Article{
+  @Get('/:id', FirstHandler, SecondHandler)
+  public index({params, query}): any{
+    return { message: 'Hello World' }
+  } 
+
+  @Post(null, FirstHandler, SecondHandler)
+  public create({body}: HttpContext): any{
+    return { body }
+  }
+
+  @Post('/not-found', FirstHandler, SecondHandler)
+  public create({request, response}: HttpContext): any{
+    // Do something
+    response.status(404).json({message: 'Not Found'})
+  }
+}
+```
+
+## Change Http Response Status
+
+You can create a custom response by using **response.status** or by using an instance of HttpResponse\<T\>. By default, data response is undefined and Http Status is 200.
+You can find all HttpStatus on **HttpResponse.StatusCode**.
+
+### Example
+
+``` Ts
+import { Controller, Post, HttpContext } from 'elsombrero/core'
+import { HttpResponse } from 'elsombrero/common/response'
+
+@Controller('/article')
+export class Article{
+  @Get('/:id')
+  public index({params, query}): HttpResponse<any>{
+    return new HttpResponse<any>({name: 'John Doe'}, 200);
+  } 
+
+  @Post('/not-found')
+  public create({request, response}: HttpContext): HttpResponse<any>{
+    // Do something
+    return new HttpResponse<any>({name: 'John Doe'}, HttpResponse.StatusCode.Created);
+  }
+}
+```
 ## Exception
-Now the library does not support exception catching except 500 status code.
-You can do it by throwing new Exception on your Controller.
-Http Exceptions are coming on the next version of the library but you can use
-[@curveball/http-errors](https://www.npmjs.com/package/@curveball/http-errors) for catching exception
 
-### First install @curveball/http-errors
-``` bash
-npm install --save @curveball/http-errors
-# or yarn
-yarn add @curveball/http-errors
-```
+New Feature, You can know Handle Exception directly from ElSombrero Library,
+All you have to do is **throwing a new exception** on your method. HttpException is the base class and you can pass your own Exception or use all implemented Exception.
+By default **HttpException** class send code 500 and Internal Server Error message.
+### Example
 
-### The import it on your code
-
-``` ts
-import { NotFound } from '@curveball/http-errors'
-```
-now you can catch your exceptions by using throw
 ``` Ts
 import { Controller, Get, HttpContext } from 'elsombrero/core'
+import { NotFoundException, HttpException } from 'elsombrero/common/exceptions'
 
 @Controller('/article')
 export class Article{
   @Get('/:id')
   public index({params, query}: HttpContext): any{
-    throw new NotFound()
+    const data = {my: 'custom data'}
+    throw new NotFoundException<any>(data, 'Ressource Not Found')
+  } 
+
+  @Get('all/')
+  public index({params, query}: HttpContext): any[]{
+    throw new HttpException<any>({my: 'custom data'}, 400, 'Forbidden')
+  }
+  
+  @Get('collection/:id')
+  public index({params, query}: HttpContext): any[]{
+    throw new NotFoundException<any>()
+  }
+}
+```
+
+You can throw Exception direclty on your HttpHandler.
+
+### Example
+
+``` Ts
+import { Controller, Get, HttpContext, HttpHandler } from 'elsombrero/core'
+import { UnauthorizedException } from 'elsombrero/common/exceptions'
+
+class AuthHandler implements HttpHandler{
+  handle(context: HttpContext): void{
+    throw new UnauthorizedException()
+  }
+}
+
+@Controller('/article', AuthHandler)
+export class Article{
+  @Get('/:id')
+  public index({params, query}: HttpContext): any{
+    const data = {my: 'custom data'}
+    return data
   } 
 }
 ```

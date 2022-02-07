@@ -1,4 +1,5 @@
 import 'reflect-metadata'
+import { HttpHandler } from '../handler.interface'
 
 export interface DataHttpType{
   url: string

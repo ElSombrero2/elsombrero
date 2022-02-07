@@ -46,6 +46,7 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Register = void 0;
+var response_1 = require("../../common/response");
 require("reflect-metadata");
 var views_1 = require("../views");
 var typedi_1 = require("typedi");
@@ -132,11 +133,11 @@ function Register(obj) {
                                                 }])];
                                     case 1:
                                         result = _c.sent();
-                                        if ((result === null || result === void 0 ? void 0 : result.constructor.name) === 'HttpResponse')
-                                            res.status(result.code).json(result.data);
-                                        else if (result instanceof views_1.View)
+                                        if (result instanceof views_1.View)
                                             res.render(result.view, result.data);
-                                        else
+                                        if (result instanceof response_1.HttpResponse)
+                                            res.status(result.code).json(result.data);
+                                        else if (result)
                                             res.json(result);
                                         return [3 /*break*/, 3];
                                     case 2:

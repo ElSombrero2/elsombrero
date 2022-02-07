@@ -10,8 +10,36 @@ interface RegisterArgs{
   context: Application
 }
 
-export function Register(obj: RegisterArgs): ClassDecorator{
+function createMiddleWares(middlewares): any[]{
+  const arr = []
+  middlewares.map((Handler) => {
+    arr.push(async (req: Request, res: Response, next: Function) => {
+      try{
+        const m = new Handler()
+        await m.handle({
+          request: req, 
+          response: res,
+          body: req.body, 
+          params: req.params,
+          query: req.query,
+          file: (req as any)?.file,
+          files: (req as any)?.files,
+          headers: req.headers,
+          next: next
+        })
+      }catch(e){
+        res.status(e.code || 500).json({
+          status: e.code || 500,
+          data:e.object,
+          message: e.message || 'Internal Server Error.'
+        }) 
+      }
+    })
+  })
+  return arr
+}
 
+export function Register(obj: RegisterArgs): ClassDecorator{
   return function(target: Function){
     obj.services.map((s) => Container.get(s))
     obj.controllers.map((constructor) => {
@@ -29,7 +57,9 @@ export function Register(obj: RegisterArgs): ClassDecorator{
         const data: DataHttpType = Reflect.getMetadata(key, constructor)
         const fun = obj.context[data.method] as Function
         console.log(`\x1b[33m${data.method.toUpperCase()} ${path + data.url}\x1b[0m`)
-        fun.apply(obj.context, [path + data.url, ...middlewares, ...data.middlewares, async (req: Request, res: Response) => {
+        fun.apply(obj.context, [path + data.url, 
+          ...createMiddleWares(middlewares), ...createMiddleWares(data.middlewares), 
+          async (req: Request, res: Response, next: Function) => {
           try{
             const result: any | View = await data.callback.apply(instance, [{
               request: (req as Request), 
@@ -39,15 +69,17 @@ export function Register(obj: RegisterArgs): ClassDecorator{
               query: req.query,
               file: (req as any)?.file,
               files: (req as any)?.files,
-              headers: req.headers
+              headers: req.headers,
+              next: next
             }])
-            if(result instanceof View) res.render(result.view, result.data)
-            else if(result) res.json(result)
+            if(result?.constructor.name === 'HttpResponse') res.status(result.code).json(result.data)
+            else if(result instanceof View) res.render(result.view, result.data)
+            else res.json(result)
           }catch(e){
-            res.status(e.httpStatus || 500).json({
-              status: e.httpStatus || 500,
-              title: e.title,
-              message: e.detail || 'Internal Server Error.'
+            res.status(e.code || 500).json({
+              status: e.code || 500,
+              data:e.object,
+              message: e.message || 'Internal Server Error.'
             }) 
           }
         }])

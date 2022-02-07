@@ -7,6 +7,10 @@ export class View{
   constructor(views: string, data?: any)
 }
 
+export interface HttpHandler{
+  handle(context: HttpContext): void;
+}
+
 interface RegisterArgs{
   controllers: any[],
   services: any[],
@@ -23,7 +27,8 @@ export interface HttpContext{
   query: any,
   file: any,
   files: any[],
-  headers: IncomingHttpHeaders
+  headers: IncomingHttpHeaders,
+  next: Function
 }
 
 export function Controller(url?: string, ...arg: Function[]): ClassDecorator
