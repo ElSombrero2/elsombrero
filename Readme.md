@@ -1,9 +1,9 @@
-## ElSombrero Typescript Http Decorator Librairie
-It's a simple librairie easy to use that allow you to create HttpController on **Express.js** Node Typescript project.
+## ElSombrero Typescript Http Decorator Library
+It's a simple library easy to use that allow you to create HttpController on **Express.js** Node Typescript project.
 
 ## Installation
 
-You can install elsombrero librairy with npm
+You can install elsombrero library with npm
 ``` bash
 npm install --save elsombrero
 ```
@@ -131,9 +131,9 @@ export interface HttpContext{
 ```
 
 ## Exception
-Now the librairy does not support exception catching except 500 status code.
+Now the library does not support exception catching except 500 status code.
 You can do it by throwing new Exception on your Controller.
-Http Exceptions are coming on the next version of the librairy but you can use
+Http Exceptions are coming on the next version of the library but you can use
 [@curveball/http-errors](https://www.npmjs.com/package/@curveball/http-errors) for catching exception
 
 ### First install @curveball/http-errors
