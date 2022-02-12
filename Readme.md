@@ -1,6 +1,10 @@
 ## ElSombrero Typescript Http Decorator Library
 It's a simple library easy to use that allow you to create HttpController on **Express.js** Node Typescript project.
 
+# Note Important
+
+Do not use 1.0.3 and 1.0.4 version due to a bug.
+
 ## Installation
 
 You can install elsombrero library with npm

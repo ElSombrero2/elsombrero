@@ -49,49 +49,14 @@ exports.Register = void 0;
 require("reflect-metadata");
 var views_1 = require("../views");
 var typedi_1 = require("typedi");
-function createMiddleWares(middlewares) {
-    var _this = this;
-    var arr = [];
-    middlewares.map(function (Handler) {
-        arr.push(function (req, res, next) { return __awaiter(_this, void 0, void 0, function () {
-            var m, e_1;
-            var _a, _b;
-            return __generator(this, function (_c) {
-                switch (_c.label) {
-                    case 0:
-                        _c.trys.push([0, 2, , 3]);
-                        m = new Handler();
-                        return [4 /*yield*/, m.handle({
-                                request: req,
-                                response: res,
-                                body: req.body,
-                                params: req.params,
-                                query: req.query,
-                                file: (_a = req) === null || _a === void 0 ? void 0 : _a.file,
-                                files: (_b = req) === null || _b === void 0 ? void 0 : _b.files,
-                                headers: req.headers,
-                                next: next
-                            })];
-                    case 1:
-                        _c.sent();
-                        return [3 /*break*/, 3];
-                    case 2:
-                        e_1 = _c.sent();
-                        res.status(e_1.code || 500).json({
-                            status: e_1.code || 500,
-                            data: e_1.object,
-                            message: e_1.message || 'Internal Server Error.'
-                        });
-                        return [3 /*break*/, 3];
-                    case 3: return [2 /*return*/];
-                }
-            });
-        }); });
-    });
-    return arr;
-}
+var utils_1 = require("./utils");
 function Register(obj) {
-    obj.context.use.apply(obj.context, obj.handlers);
+    obj.handlers.map(function (handler) {
+        obj.context.use(function (req, res, next) {
+            var m = new handler();
+            m.handle((0, utils_1.createContext)(req, res, next));
+        });
+    });
     return function (target) {
         var _this = this;
         obj.services.map(function (s) { return typedi_1.default.get(s); });
@@ -113,26 +78,15 @@ function Register(obj) {
                     data = Reflect.getMetadata(key, constructor);
                     fun = obj.context[data.method];
                     console.log("\u001B[33m".concat(data.method.toUpperCase(), " ").concat(path + data.url, "\u001B[0m"));
-                    fun.apply(obj.context, __spreadArray(__spreadArray(__spreadArray([(path + data.url !== '') ? path + data.url : '/'], createMiddleWares(middlewares), true), createMiddleWares(data.middlewares), true), [function (req, res, next) { return __awaiter(_this, void 0, void 0, function () {
-                            var result, e_2;
-                            var _a, _b;
-                            return __generator(this, function (_c) {
-                                switch (_c.label) {
+                    fun.apply(obj.context, __spreadArray(__spreadArray(__spreadArray([(path + data.url !== '') ? path + data.url : '/'], (0, utils_1.createMiddleWares)(middlewares), true), (0, utils_1.createMiddleWares)(data.middlewares), true), [function (req, res, next) { return __awaiter(_this, void 0, void 0, function () {
+                            var result, e_1;
+                            return __generator(this, function (_a) {
+                                switch (_a.label) {
                                     case 0:
-                                        _c.trys.push([0, 2, , 3]);
-                                        return [4 /*yield*/, data.callback.apply(instance, [{
-                                                    request: req,
-                                                    response: res,
-                                                    body: req.body,
-                                                    params: req.params,
-                                                    query: req.query,
-                                                    file: (_a = req) === null || _a === void 0 ? void 0 : _a.file,
-                                                    files: (_b = req) === null || _b === void 0 ? void 0 : _b.files,
-                                                    headers: req.headers,
-                                                    next: next
-                                                }])];
+                                        _a.trys.push([0, 2, , 3]);
+                                        return [4 /*yield*/, data.callback.apply(instance, [(0, utils_1.createContext)(req, res, next)])];
                                     case 1:
-                                        result = _c.sent();
+                                        result = _a.sent();
                                         if ((result === null || result === void 0 ? void 0 : result.constructor.name) === 'HttpResponse')
                                             res.status(result.code).json(result.data);
                                         else if (result instanceof views_1.View)
@@ -141,11 +95,11 @@ function Register(obj) {
                                             res.json(result);
                                         return [3 /*break*/, 3];
                                     case 2:
-                                        e_2 = _c.sent();
-                                        res.status(e_2.code || 500).json({
-                                            status: e_2.code || 500,
-                                            data: e_2.object,
-                                            message: e_2.message || 'Internal Server Error.'
+                                        e_1 = _a.sent();
+                                        res.status(e_1.code || 500).json({
+                                            status: e_1.code || 500,
+                                            data: e_1.object,
+                                            message: e_1.message || 'Internal Server Error.'
                                         });
                                         return [3 /*break*/, 3];
                                     case 3: return [2 /*return*/];
