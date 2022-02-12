@@ -12,7 +12,8 @@ export interface HttpContext{
   query: any,
   file: any,
   files: any[],
-  headers: IncomingHttpHeaders
+  headers: IncomingHttpHeaders,
+  next?: Function
 }
 
 
