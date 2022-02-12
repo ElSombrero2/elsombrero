@@ -5,9 +5,10 @@ import { View } from '../views'
 import Container from 'typedi'
 
 interface RegisterArgs{
-  controllers: any[],
-  services: any[],
+  controllers: Function[]
+  services: Function[]
   context: Application
+  handlers?: Function[]
 }
 
 function createMiddleWares(middlewares): any[]{
@@ -40,6 +41,7 @@ function createMiddleWares(middlewares): any[]{
 }
 
 export function Register(obj: RegisterArgs): ClassDecorator{
+  obj.context.use.apply(obj.context, obj.handlers)
   return function(target: Function){
     obj.services.map((s) => Container.get(s))
     obj.controllers.map((constructor) => {
@@ -57,7 +59,7 @@ export function Register(obj: RegisterArgs): ClassDecorator{
         const data: DataHttpType = Reflect.getMetadata(key, constructor)
         const fun = obj.context[data.method] as Function
         console.log(`\x1b[33m${data.method.toUpperCase()} ${path + data.url}\x1b[0m`)
-        fun.apply(obj.context, [path + data.url, 
+        fun.apply(obj.context, [(path + data.url !== '') ? path + data.url : '/', 
           ...createMiddleWares(middlewares), ...createMiddleWares(data.middlewares), 
           async (req: Request, res: Response, next: Function) => {
           try{

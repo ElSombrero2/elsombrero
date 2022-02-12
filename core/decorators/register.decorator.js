@@ -91,6 +91,7 @@ function createMiddleWares(middlewares) {
     return arr;
 }
 function Register(obj) {
+    obj.context.use.apply(obj.context, obj.handlers);
     return function (target) {
         var _this = this;
         obj.services.map(function (s) { return typedi_1.default.get(s); });
@@ -112,7 +113,7 @@ function Register(obj) {
                     data = Reflect.getMetadata(key, constructor);
                     fun = obj.context[data.method];
                     console.log("\u001B[33m".concat(data.method.toUpperCase(), " ").concat(path + data.url, "\u001B[0m"));
-                    fun.apply(obj.context, __spreadArray(__spreadArray(__spreadArray([path + data.url], createMiddleWares(middlewares), true), createMiddleWares(data.middlewares), true), [function (req, res, next) { return __awaiter(_this, void 0, void 0, function () {
+                    fun.apply(obj.context, __spreadArray(__spreadArray(__spreadArray([(path + data.url !== '') ? path + data.url : '/'], createMiddleWares(middlewares), true), createMiddleWares(data.middlewares), true), [function (req, res, next) { return __awaiter(_this, void 0, void 0, function () {
                             var result, e_2;
                             var _a, _b;
                             return __generator(this, function (_c) {
