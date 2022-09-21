@@ -38,15 +38,14 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createMiddleWares = exports.createContext = void 0;
 function createContext(req, res, next) {
-    var _a, _b;
     return {
         request: req,
         response: res,
         body: req.body,
         params: req.params,
         query: req.query,
-        file: (_a = req) === null || _a === void 0 ? void 0 : _a.file,
-        files: (_b = req) === null || _b === void 0 ? void 0 : _b.files,
+        file: req === null || req === void 0 ? void 0 : req.file,
+        files: req === null || req === void 0 ? void 0 : req.files,
         headers: req.headers,
         next: next
     };

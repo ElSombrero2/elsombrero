@@ -1,6 +1,6 @@
 {
   "name": "elsombrero",
-  "version": "1.0.5",
+  "version": "1.0.7",
   "main": "index.js",
   "license": "MIT",
   "devDependencies": {
@@ -9,10 +9,10 @@
     "typescript": "^4.5.5"
   },
   "scripts": {
-    "core": "tsc src/core/index.ts --outDir core --target \"ES5\"",
-    "common/exceptions": "tsc src/common/exceptions/index.ts --outDir common/exceptions --target \"ES5\"",
-    "common/response": "tsc src/common/response/index.ts --outDir common/response --target \"ES5\"",
-    "compile": "yarn core && yarn common/exceptions && yarn common/response"
+    "core": "tsc src/core/index.ts --outDir core --target \"ES5\" --declaration",
+    "common/exceptions": "tsc src/common/exceptions/index.ts --outDir common/exceptions --target \"ES5\" --declaration",
+    "common/response": "tsc src/common/response/index.ts --outDir common/response --target \"ES5\" --declaration",
+    "compile": "npm run core && npm run common/exceptions && npm run common/response"
   },
   "dependencies": {
     "reflect-metadata": "^0.1.13",
